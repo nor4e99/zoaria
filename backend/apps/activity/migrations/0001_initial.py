@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('pets', '0001_initial'),
+        ('apps.pets', '0001_initial'),
     ]
 
     operations = [
