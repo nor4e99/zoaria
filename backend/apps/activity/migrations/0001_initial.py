@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='ActivityLog',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('activity_type', models.CharField(choices=[('walk','Walk'),('run','Run'),('play','Play'),('swim','Swim'),('training','Training'),('other','Other')], default='walk', max_length=50)),
+                ('activity_type', models.CharField(choices=[('walk', 'Walk'), ('run', 'Run'), ('play', 'Play'), ('swim', 'Swim'), ('training', 'Training'), ('other', 'Other')], default='walk', max_length=50)),
                 ('distance', models.FloatField(blank=True, null=True)),
                 ('duration_minutes', models.IntegerField(blank=True, null=True)),
                 ('calories_burned', models.FloatField(blank=True, null=True)),
