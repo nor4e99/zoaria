@@ -9,13 +9,12 @@ DEBUG = False
 
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
-# ─── CORS ────────────────────────────────────────
+# ─── CORS ─────────────────────────────────────────────────────────────────────
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_URLS_REGEX = r'^.*$'
 
-# ─── Security headers ────────────────────────────
-SECURE_SSL_REDIRECT = False
+# ─── Security headers ─────────────────────────────────────────────────────────
+SECURE_SSL_REDIRECT            = False
 SESSION_COOKIE_SECURE          = True
 CSRF_COOKIE_SECURE             = True
 SECURE_BROWSER_XSS_FILTER      = True
