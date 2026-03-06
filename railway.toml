@@ -5,7 +5,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "backend/Dockerfile"
 
 [deploy]
-releaseCommand = "python manage.py setup_zoaria"
+releaseCommand = "python manage.py migrate --noinput"
 startCommand = "daphne -b 0.0.0.0 -p $PORT config.asgi:application"
 healthcheckPath = "/api/auth/health/"
 healthcheckTimeout = 30
