@@ -66,7 +66,7 @@ api.interceptors.response.use(
 export const authApi = {
   registerOwner: (data: any) => api.post('/auth/register/owner/', data),
   registerVet: (data: any) => api.post('/auth/register/vet/', data),
-  login: (data: any) => api.post('/auth/login/', data),
+  login: (emailOrData: any, password?: string) => api.post('/auth/login/', password ? { email: emailOrData, password } : emailOrData),
   logout: () => api.post('/auth/logout/'),
   verifyEmail: (token: string) => api.post('/auth/verify-email/', { token }),
   resendVerification: (email: string) => api.post('/auth/resend-verification/', { email }),
