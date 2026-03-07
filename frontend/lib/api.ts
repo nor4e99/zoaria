@@ -160,7 +160,7 @@ export const adminApi = {
   toggleUser: (id: number) => api.post(`/admin-panel/users/${id}/toggle/`),
   pendingVets: () => api.get('/admin-panel/vets/pending/'),
   approveVet: (id: number) => api.post(`/admin-panel/vets/${id}/approve/`),
-  rejectVet: (id: number) => api.post(`/admin-panel/vets/${id}/reject/`),
+  rejectVet: (id: number, reason?: string) => api.post(`/admin-panel/vets/${id}/reject/`, { reason }),
   analytics: () => api.get('/admin-panel/analytics/'),
   getStats: () => api.get('/admin-panel/stats/'),
 };
