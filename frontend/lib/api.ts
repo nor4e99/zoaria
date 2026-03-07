@@ -76,6 +76,8 @@ export const authApi = {
   getProfile: () => api.get('/auth/profile/'),
   getMe: () => api.get('/auth/me/'),
   me: () => api.get('/auth/me/'),
+};
+
 
 export const petsApi = {
   list: () => api.get('/pets/'),
