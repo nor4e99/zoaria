@@ -23,10 +23,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """
-    Custom User model mapped to zoaria_full_platform_schema.sql `users` table.
-    Extends with Django auth fields needed for admin/staff access.
-    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
     ROLE_CHOICES = [
         ('owner', 'Pet Owner'),
         ('vet', 'Veterinarian'),
