@@ -75,7 +75,7 @@ export const authApi = {
   updateProfile: (data: any) => api.patch('/auth/profile/', data),
   getProfile: () => api.get('/auth/profile/'),
   getMe: () => api.get('/auth/me/'),
-};
+  me: () => api.get('/auth/me/'),
 
 export const petsApi = {
   list: () => api.get('/pets/'),
