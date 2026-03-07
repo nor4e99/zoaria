@@ -33,7 +33,3 @@ class EmailVerificationTokenAdmin(admin.ModelAdmin):
 class PasswordResetTokenAdmin(admin.ModelAdmin):
     list_display = ('user', 'token', 'used', 'expires_at')
 
-
-@admin.register(PasswordResetToken)
-class PasswordResetTokenAdmin(admin.ModelAdmin):
-    list_display = ('user', 'token', 'used', 'expires_at')
