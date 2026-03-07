@@ -33,4 +33,19 @@ class Migration(migrations.Migration):
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at timestamp with time zone NOT NULL DEFAULT now();",
             migrations.RunSQL.noop,
         ),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.AlterField(
+                    model_name='user',
+                    name='email_verified',
+                    field=models.BooleanField(default=False),
+                ),
+                migrations.AlterField(
+                    model_name='user',
+                    name='created_at',
+                    field=models.DateTimeField(default=django.utils.timezone.now),
+                ),
+            ],
+            database_operations=[],
+        ),
     ]
