@@ -30,15 +30,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('owner', 'Pet Owner'),
         ('vet', 'Veterinarian'),
-        ('admin', 'Administrator'),
+          ('admin', 'Admin'),
     ]
 
     email = models.EmailField(unique=True)
+    full_name = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='owner')
-    email_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
+    is_email_verified = models.BooleanField(default=False)
+    phone = models.CharField(max_length=20, blank=True)
+    date_joined = models.DateTimeField(default=timezone.now)
 
     objects = UserManager()
 
