@@ -5,18 +5,17 @@ from .models import User, UserProfile, EmailVerificationToken, PasswordResetToke
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'full_name', 'role', 'is_email_verified', 'date_joined')
-    list_filter = ('role', 'is_email_verified', 'is_active')
-    search_fields = ('email', 'full_name')
-    ordering = ('date_joined',)
+    list_display = ('email', 'role', 'email_verified', 'is_active', 'created_at')
+    list_filter = ('role', 'email_verified', 'is_active')
+    search_fields = ('email',)
+    ordering = ('created_at',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal', {'fields': ('full_name', 'phone', 'role')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'is_email_verified', 'groups', 'user_permissions')}),
-        ('Dates', {'fields': ('date_joined', 'last_login')}),
+        ('Info', {'fields': ('role',)}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'email_verified', 'groups', 'user_permissions')}),
     )
     add_fieldsets = (
-        (None, {'classes': ('wide',), 'fields': ('email', 'full_name', 'password1', 'password2', 'role')}),
+        (None, {'classes': ('wide',), 'fields': ('email', 'password1', 'password2', 'role')}),
     )
 
 
@@ -28,6 +27,11 @@ class UserProfileAdmin(admin.ModelAdmin):
 @admin.register(EmailVerificationToken)
 class EmailVerificationTokenAdmin(admin.ModelAdmin):
     list_display = ('user', 'token', 'expires_at')
+
+
+@admin.register(PasswordResetToken)
+class PasswordResetTokenAdmin(admin.ModelAdmin):
+    list_display = ('user', 'token', 'used', 'expires_at')
 
 
 @admin.register(PasswordResetToken)
