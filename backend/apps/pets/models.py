@@ -1,5 +1,4 @@
 from django.db import models
-from apps.users.models import User
 
 
 class Species(models.Model):
@@ -51,7 +50,7 @@ class Pet(models.Model):
         ('very_active', 'Very Active'),
     ]
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pets')
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='pets')
     name = models.CharField(max_length=150)
     species = models.ForeignKey(Species, on_delete=models.SET_NULL, null=True)
     breed = models.ForeignKey(Breed, on_delete=models.SET_NULL, null=True, blank=True)

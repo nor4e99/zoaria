@@ -1,10 +1,9 @@
 from django.db import models
-from apps.users.models import User
 
 
 class VetProfile(models.Model):
     """Maps to `vet_profiles` table."""
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vet_profile')
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE, related_name='vet_profile')
     specialization = models.CharField(max_length=255, blank=True)
     years_experience = models.IntegerField(null=True, blank=True)
     clinic_name = models.CharField(max_length=255, blank=True)
@@ -24,7 +23,7 @@ class VetProfile(models.Model):
 class VetReview(models.Model):
     """Pet owner reviews for veterinarians."""
     vet = models.ForeignKey(VetProfile, on_delete=models.CASCADE, related_name='reviews')
-    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
+    reviewer = models.ForeignKey('users.User', on_delete=models.CASCADE)
     rating = models.IntegerField()  # 1–5
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

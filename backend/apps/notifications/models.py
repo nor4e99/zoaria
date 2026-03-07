@@ -1,5 +1,4 @@
 from django.db import models
-from apps.users.models import User
 
 
 class Notification(models.Model):
@@ -13,7 +12,7 @@ class Notification(models.Model):
         ('system', 'System'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='notifications')
     title = models.CharField(max_length=255)
     message = models.TextField()
     notification_type = models.CharField(max_length=50, choices=TYPE_CHOICES, default='system')

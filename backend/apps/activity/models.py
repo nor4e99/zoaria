@@ -1,5 +1,4 @@
 from django.db import models
-from apps.pets.models import Pet
 
 
 class ActivityLog(models.Model):
@@ -13,7 +12,7 @@ class ActivityLog(models.Model):
         ('other',    'Other'),
     ]
 
-    pet              = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='activity_logs')
+    pet              = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, related_name='activity_logs')
     activity_type    = models.CharField(max_length=50, choices=ACTIVITY_TYPES, default='walk')
     distance         = models.FloatField(null=True, blank=True)          # km
     duration_minutes = models.IntegerField(null=True, blank=True)        # minutes

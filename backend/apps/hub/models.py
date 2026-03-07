@@ -1,5 +1,4 @@
 from django.db import models
-from apps.users.models import User
 
 
 class HubArticle(models.Model):
@@ -7,7 +6,7 @@ class HubArticle(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     language = models.CharField(max_length=10, default='en')
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    author = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     published = models.BooleanField(default=True)
     tags = models.CharField(max_length=255, blank=True)  # comma-separated

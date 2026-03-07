@@ -6,14 +6,13 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.urls import path
 
-from apps.pets.models import Pet, Species
 
 
 # ─── Models ───────────────────────────────────────────────────────────────────
 
 class FeedingLog(models.Model):
     """Maps to `feeding_logs` table."""
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='feeding_logs')
+    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, related_name='feeding_logs')
     food_type = models.CharField(max_length=100)
     amount = models.FloatField()  # grams
     calories = models.IntegerField(null=True, blank=True)
@@ -26,7 +25,7 @@ class FeedingLog(models.Model):
 
 class FeedingGuideline(models.Model):
     """Maps to `feeding_guidelines` table (from veterinary DB)."""
-    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    species = models.ForeignKey('pets.Species', on_delete=models.CASCADE)
     food_category = models.CharField(max_length=100)
     food_name = models.CharField(max_length=150)
 

@@ -1,6 +1,4 @@
 from django.db import models
-from apps.users.models import User
-from apps.pets.models import Pet
 
 
 class Appointment(models.Model):
@@ -12,9 +10,9 @@ class Appointment(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointments_as_owner')
-    vet = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointments_as_vet')
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='appointments')
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='appointments_as_owner')
+    vet = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='appointments_as_vet')
+    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, related_name='appointments')
     appointment_time = models.DateTimeField()
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     notes = models.TextField(blank=True)
@@ -34,7 +32,7 @@ class Reminder(models.Model):
         ('custom', 'Custom'),
     ]
 
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='reminders')
+    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, related_name='reminders')
     reminder_type = models.CharField(max_length=100, choices=REMINDER_TYPES)
     reminder_date = models.DateField()
     repeat_interval_days = models.IntegerField(null=True, blank=True)

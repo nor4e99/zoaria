@@ -1,5 +1,4 @@
 from django.db import models
-from apps.users.models import User
 
 
 class Subscription(models.Model):
@@ -10,7 +9,7 @@ class Subscription(models.Model):
         ('premium', 'Premium'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subscriptions')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='subscriptions')
     plan_name = models.CharField(max_length=50, choices=PLAN_CHOICES, default='basic')
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
@@ -33,7 +32,7 @@ class Payment(models.Model):
         ('refunded', 'Refunded'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='payments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=10, default='EUR')
     payment_status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
@@ -59,8 +58,8 @@ class Consultation(models.Model):
     conversation = models.ForeignKey(
         'chat.Conversation', on_delete=models.SET_NULL, null=True, blank=True
     )
-    vet = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vet_consultations')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner_consultations')
+    vet = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='vet_consultations')
+    owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='owner_consultations')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)

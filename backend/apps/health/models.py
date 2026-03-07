@@ -1,12 +1,10 @@
 from django.db import models
-from apps.users.models import User
-from apps.pets.models import Pet
 
 
 class MedicalRecord(models.Model):
     """Maps to `medical_records` table."""
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='medical_records')
-    vet = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='authored_records')
+    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, related_name='medical_records')
+    vet = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='authored_records')
     diagnosis = models.TextField(blank=True)
     treatment = models.TextField(blank=True)
     notes = models.TextField(blank=True)
@@ -22,8 +20,8 @@ class MedicalRecord(models.Model):
 
 class Prescription(models.Model):
     """Maps to `prescriptions` table."""
-    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='prescriptions')
-    vet = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authored_prescriptions')
+    pet = models.ForeignKey('pets.Pet', on_delete=models.CASCADE, related_name='prescriptions')
+    vet = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='authored_prescriptions')
     medication_name = models.CharField(max_length=255)
     dosage = models.CharField(max_length=100, blank=True)
     duration = models.CharField(max_length=100, blank=True)
