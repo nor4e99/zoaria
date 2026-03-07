@@ -30,7 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('owner', 'Pet Owner'),
         ('vet', 'Veterinarian'),
-          ('admin', 'Admin'),
+         ('admin', 'Administrator'),
     ]
 
     email = models.EmailField(unique=True)
