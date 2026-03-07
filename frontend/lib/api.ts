@@ -142,6 +142,7 @@ export const notificationsApi = {
 
 export const paymentsApi = {
   getSubscription: () => api.get('/payments/subscription/'),
+  subscribe: (plan: string) => api.post('/payments/subscribe/', { plan }),
   createCheckout: (data: any) => api.post('/payments/checkout/', data),
   getHistory: () => api.get('/payments/history/'),
 };
