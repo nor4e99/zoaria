@@ -9,9 +9,17 @@ DEBUG = False
 
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
 
-# ─── CORS ─────────────────────────────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = True
+# --- CORS & SECURITY SETTINGS ---
+
+# Get origins from Railway environment variables
+cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins if origin.strip()]
+
+csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins if origin.strip()]
+
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False  # Must be False if Allow Credentials is True
 
 # ─── Security headers ─────────────────────────────────────────────────────────
 SECURE_SSL_REDIRECT            = False
