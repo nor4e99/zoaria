@@ -13,6 +13,7 @@ from .views import (
     ChangePasswordView,
     LogoutView,
     MeView,
+    HealthCheckView,
 )
 
 urlpatterns = [
@@ -37,4 +38,7 @@ urlpatterns = [
     # Profile
     path('profile/', ProfileView.as_view(), name='profile'),
     path('me/', MeView.as_view(), name='me'),
+
+    # Health check (Railway deployment probe)
+    path('health/', HealthCheckView.as_view(), name='health-check'),
 ]

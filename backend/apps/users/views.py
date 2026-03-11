@@ -238,6 +238,14 @@ class LogoutView(APIView):
             return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class HealthCheckView(APIView):
+    """Railway health check endpoint."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({'status': 'ok'})
+
+
 class MeView(APIView):
     """Returns current user info including profile and subscription."""
     permission_classes = [IsAuthenticated]

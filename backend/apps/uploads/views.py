@@ -57,7 +57,7 @@ class PetPhotoUploadView(APIView):
                     pass
             return Response({'photo_url': photo_url, 'public_id': result['public_id']})
         except Exception as e:
-            return Response({'error': str(e)}, status=500)
+            return Response({'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
 
 class VetLicenseUploadView(APIView):
@@ -92,7 +92,7 @@ class VetLicenseUploadView(APIView):
                 pass
             return Response({'document_url': doc_url, 'public_id': result['public_id']})
         except Exception as e:
-            return Response({'error': str(e)}, status=500)
+            return Response({'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
 
 class GenericImageUploadView(APIView):
@@ -114,4 +114,4 @@ class GenericImageUploadView(APIView):
             )
             return Response({'url': result['secure_url'], 'public_id': result['public_id']})
         except Exception as e:
-            return Response({'error': str(e)}, status=500)
+            return Response({'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
