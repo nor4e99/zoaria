@@ -87,18 +87,23 @@ ASGI_APPLICATION = 'config.asgi.application'
 
 # Database
 import dj_database_url
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = (
+    os.environ.get('DATABASE_URL') or
+    os.environ.get('DATABASE_PRIVATE_URL') or
+    os.environ.get('POSTGRES_URL') or
+    os.environ.get('POSTGRES_PRIVATE_URL')
+)
 if DATABASE_URL:
     DATABASES = {'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)}
 else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DB_NAME', 'zoaria'),
-            'USER': os.environ.get('DB_USER', 'postgres'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-            'HOST': os.environ.get('DB_HOST', 'localhost'),
-            'PORT': os.environ.get('DB_PORT', '5432'),
+            'NAME': os.environ.get('DB_NAME', os.environ.get('PGDATABASE', 'zoaria')),
+            'USER': os.environ.get('DB_USER', os.environ.get('PGUSER', 'postgres')),
+            'PASSWORD': os.environ.get('DB_PASSWORD', os.environ.get('PGPASSWORD', 'postgres')),
+            'HOST': os.environ.get('DB_HOST', os.environ.get('PGHOST', 'localhost')),
+            'PORT': os.environ.get('DB_PORT', os.environ.get('PGPORT', '5432')),
         }
     }
 
