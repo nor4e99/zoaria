@@ -7,7 +7,8 @@ import os
 
 DEBUG = False
 
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
+_allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(',') if h.strip()] or ['.railway.app', 'localhost', '127.0.0.1']
 
 # --- CORS & SECURITY SETTINGS ---
 

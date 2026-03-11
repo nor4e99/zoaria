@@ -44,7 +44,7 @@ class SubscribeView(APIView):
         # Create Stripe checkout session
         price_id = settings.STRIPE_PLANS.get(plan)
         if not price_id:
-            return Response({'error': 'Stripe price not configured.'}, status=500)
+            return Response({'error': 'Stripe price not configured.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         try:
             session = stripe.checkout.Session.create(
@@ -58,7 +58,7 @@ class SubscribeView(APIView):
             )
             return Response({'checkout_url': session.url})
         except stripe.error.StripeError as e:
-            return Response({'error': str(e)}, status=500)
+            return Response({'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
 
 class StripeWebhookView(APIView):
