@@ -280,3 +280,39 @@ Before going live:
 - [ ] HTTPS enforced (Railway provides SSL automatically)
 - [ ] Frontend NEXT_PUBLIC_API_URL points to production backend
 - [ ] Frontend NEXT_PUBLIC_WS_URL uses `wss://` (not `ws://`)
+
+---
+
+## 11. Database Auth Troubleshooting (Railway)
+
+If you see errors like:
+
+```text
+psycopg2.OperationalError: FATAL: password authentication failed for user "postgres"
+```
+
+it almost always means your service is reading stale DB credentials.
+
+### What to check in Railway Variables
+
+1. Ensure `DATABASE_URL` (or `DATABASE_PRIVATE_URL`) exists and was injected from your Railway Postgres service.
+2. Remove old manually-added DB vars if present:
+   - `DB_USER`
+   - `DB_PASSWORD`
+   - `DB_HOST`
+   - `DB_PORT`
+   - `DB_NAME`
+3. Prefer Railway-managed `PG*` variables (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`) when a full DB URL is not available.
+4. Redeploy after variable changes.
+
+### Quick shell verification (inside Railway web service)
+
+```bash
+python - <<'PY'
+import os
+print('DATABASE_URL set:', bool(os.getenv('DATABASE_URL')))
+print('DATABASE_PRIVATE_URL set:', bool(os.getenv('DATABASE_PRIVATE_URL')))
+for k in ['PGHOST', 'PGPORT', 'PGUSER', 'PGPASSWORD', 'PGDATABASE', 'DB_HOST', 'DB_USER']:
+    print(f'{k}:', 'set' if os.getenv(k) else 'missing')
+PY
+```

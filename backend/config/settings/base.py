@@ -87,23 +87,42 @@ ASGI_APPLICATION = 'config.asgi.application'
 
 # Database
 import dj_database_url
-DATABASE_URL = (
-    os.environ.get('DATABASE_URL') or
-    os.environ.get('DATABASE_PRIVATE_URL') or
-    os.environ.get('POSTGRES_URL') or
-    os.environ.get('POSTGRES_PRIVATE_URL')
+
+
+def _first_env(*keys: str):
+    """Return the first non-empty environment variable from keys."""
+    for key in keys:
+        value = os.environ.get(key)
+        if value:
+            return value
+    return None
+
+
+DATABASE_URL = _first_env(
+    'DATABASE_URL',
+    'DATABASE_PRIVATE_URL',
+    'POSTGRES_URL',
+    'POSTGRES_PRIVATE_URL',
 )
+
 if DATABASE_URL:
-    DATABASES = {'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)}
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=os.environ.get('DB_SSL_REQUIRE', 'false').lower() == 'true',
+        )
+    }
 else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DB_NAME', os.environ.get('PGDATABASE', 'zoaria')),
-            'USER': os.environ.get('DB_USER', os.environ.get('PGUSER', 'postgres')),
-            'PASSWORD': os.environ.get('DB_PASSWORD', os.environ.get('PGPASSWORD', 'postgres')),
-            'HOST': os.environ.get('DB_HOST', os.environ.get('PGHOST', 'localhost')),
-            'PORT': os.environ.get('DB_PORT', os.environ.get('PGPORT', '5432')),
+            # Prefer Postgres provider vars (PG*) over local docker-style DB_* overrides.
+            'NAME': _first_env('PGDATABASE', 'POSTGRES_DB', 'DB_NAME') or 'zoaria',
+            'USER': _first_env('PGUSER', 'POSTGRES_USER', 'DB_USER') or 'postgres',
+            'PASSWORD': _first_env('PGPASSWORD', 'POSTGRES_PASSWORD', 'DB_PASSWORD') or 'postgres',
+            'HOST': _first_env('PGHOST', 'POSTGRES_HOST', 'DB_HOST') or 'localhost',
+            'PORT': _first_env('PGPORT', 'POSTGRES_PORT', 'DB_PORT') or '5432',
         }
     }
 
