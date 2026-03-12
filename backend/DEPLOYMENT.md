@@ -280,3 +280,82 @@ Before going live:
 - [ ] HTTPS enforced (Railway provides SSL automatically)
 - [ ] Frontend NEXT_PUBLIC_API_URL points to production backend
 - [ ] Frontend NEXT_PUBLIC_WS_URL uses `wss://` (not `ws://`)
+
+---
+
+## 11. Database Auth Troubleshooting (Railway)
+
+If you see errors like:
+
+```text
+psycopg2.OperationalError: FATAL: password authentication failed for user "postgres"
+```
+
+it almost always means your service is reading stale DB credentials.
+
+### What to check in Railway Variables
+
+1. Ensure `DATABASE_URL` (or `DATABASE_PRIVATE_URL`) exists and was injected from your Railway Postgres service.
+2. Remove old manually-added DB vars if present:
+   - `DB_USER`
+   - `DB_PASSWORD`
+   - `DB_HOST`
+   - `DB_PORT`
+   - `DB_NAME`
+3. Prefer Railway-managed `PG*` variables (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`) when a full DB URL is not available.
+4. Redeploy after variable changes.
+
+### Quick shell verification (inside Railway web service)
+
+```bash
+python - <<'PY'
+import os
+print('DATABASE_URL set:', bool(os.getenv('DATABASE_URL')))
+print('DATABASE_PRIVATE_URL set:', bool(os.getenv('DATABASE_PRIVATE_URL')))
+for k in ['PGHOST', 'PGPORT', 'PGUSER', 'PGPASSWORD', 'PGDATABASE', 'DB_HOST', 'DB_USER']:
+    print(f'{k}:', 'set' if os.getenv(k) else 'missing')
+PY
+```
+
+### Additional recovery steps
+
+1. If you rotated DB credentials in Railway, redeploy **all** services that use Postgres (web + worker + beat) so they all pick up the new env vars.
+2. If `DATABASE_URL` and `DB_*` both exist, remove `DB_*` to prevent accidental override drift.
+3. Verify real runtime DB connectivity from the service shell:
+
+```bash
+python manage.py dbshell <<'EOF_SQL'
+SELECT current_database(), current_user;
+EOF_SQL
+```
+
+If `dbshell` fails, the runtime credentials are still wrong.
+
+### If the service crashes on startup with `libpq.so.5` / `No module named psycopg`
+
+This is a dependency/runtime mismatch (not wrong DB credentials).
+
+Common log patterns:
+- `ImportError: libpq.so.5: cannot open shared object file`
+- `ModuleNotFoundError: No module named 'psycopg'`
+- `ImproperlyConfigured: Error loading psycopg2 or psycopg module`
+
+Fix applied in this repo:
+- Use `psycopg[binary]` in `requirements.txt` so Railway/Nixpacks Python runtimes (including 3.13) can load the PostgreSQL driver without a missing `libpq` shared library.
+
+After deploy:
+1. Trigger a full redeploy (clear build cache if Railway still uses old wheels).
+2. Open Railway shell and run:
+
+```bash
+python - <<'PY'
+import psycopg
+print('psycopg OK:', psycopg.__version__)
+PY
+```
+
+3. Then run migrations:
+
+```bash
+python manage.py migrate
+```
