@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -29,14 +29,7 @@ export default function PetDetailPage() {
   const { id } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const requestedTab = searchParams.get('tab');
-  const requestedTabIsValid = TABS.some((item) => item.key === requestedTab);
-  const [tab, setTab] = useState(requestedTabIsValid ? requestedTab! : 'overview');
-
-  useEffect(() => {
-    if (requestedTabIsValid && requestedTab && requestedTab !== tab) {
-      setTab(requestedTab);
-    }
-  }, [requestedTabIsValid, requestedTab, tab]);
+  const [tab, setTab] = useState(TABS.some((item) => item.key === requestedTab) ? requestedTab! : 'overview');
 
   const { data: pet, isLoading } = useQuery({
     queryKey: ['pet', id],
@@ -309,7 +302,7 @@ export default function PetDetailPage() {
                     <div key={a.id} className="p-3 bg-sage-50 rounded-xl mb-2">
                       <p className="font-semibold text-sm text-obsidian-800 capitalize">{a.activity_type}</p>
                       <p className="text-xs text-obsidian-500">
-                        {a.distance || 0} km · {a.duration_minutes || 0} min · {a.calories_burned || a.estimated_calories || 0} kcal
+                        {a.distance ?? 0} km · {a.duration_minutes ?? 0} min · {a.calories_burned ?? a.estimated_calories ?? 0} kcal
                       </p>
                       <p className="text-xs text-obsidian-400 mt-1">{new Date(a.activity_date).toLocaleDateString()}</p>
                     </div>

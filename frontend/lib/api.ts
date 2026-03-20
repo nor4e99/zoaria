@@ -114,8 +114,16 @@ export const feedingApi = {
 };
 
 export const activityApi = {
-  logs: (petId: number, params?: { since?: string; until?: string }) => api.get(`/activity/pets/${petId}/`, { params }),
-  stats: (petId: number, period = 30) => api.get(`/activity/pets/${petId}/stats/?period=${period}`),
+  logs: (petId: number, params?: { since?: string; until?: string }) =>
+    api.get(`/activity/pets/${petId}/`, {
+      params: params
+        ? Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined))
+        : undefined,
+    }),
+  stats: (petId: number, period = 30) =>
+    api.get(`/activity/pets/${petId}/stats/`, {
+      params: { period: Math.min(365, Math.max(1, period)) },
+    }),
   createLog: (petId: number, data: any) => api.post(`/activity/pets/${petId}/`, data),
   deleteLog: (id: number) => api.delete(`/activity/${id}/`),
 };

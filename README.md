@@ -220,6 +220,29 @@ EMAIL_HOST_PASSWORD=...
 FRONTEND_URL=https://...
 ```
 
+### Optional: use Supabase as the PostgreSQL provider
+
+You can run ZOARIA on Supabase Postgres without changing application code.
+
+1. Create a Supabase project.
+2. In Supabase: **Project Settings → Database → Connection string**.
+3. Copy the **URI** and set it as `DATABASE_URL` in `backend/.env`.
+
+Example:
+```env
+DATABASE_URL=postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres
+```
+
+Then run:
+```bash
+cd backend
+python manage.py setup_zoaria
+```
+
+Notes:
+- Keep `sslmode=require` if your connection string includes SSL params.
+- Current auth, realtime, and file upload features are implemented via Django JWT + Channels + Cloudinary, so Supabase is used here as managed Postgres.
+
 ---
 
 ## Deployment
@@ -266,4 +289,3 @@ send_due_reminders.apply()          # Test daily reminder
 send_appointment_reminders.apply()  # Test appointment 24h alert
 send_weekly_digest.apply()          # Test Monday digest
 ```
-
