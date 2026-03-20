@@ -1,16 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Edit, Trash2, Activity, Calendar, Utensils, Heart, FileText } from 'lucide-react';
-import { petsApi, healthApi, feedingApi } from '@/lib/api';
+import { ArrowLeft, Edit, Activity, Calendar, Utensils, Heart, FileText } from 'lucide-react';
+import { petsApi, healthApi, feedingApi, activityApi, calendarApi } from '@/lib/api';
 import { BMIIndicator } from '@/components/pets/BMIIndicator';
 import { useT } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
-import { toast } from '@/components/ui/Toaster';
 
 const AVATARS: Record<string, string> = {
   dog: '🐕', cat: '🐈', horse: '🐎', rabbit: '🐇',
@@ -28,8 +27,16 @@ const TABS = [
 export default function PetDetailPage() {
   const t = useT();
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const [tab, setTab] = useState('overview');
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const requestedTabIsValid = TABS.some((item) => item.key === requestedTab);
+  const [tab, setTab] = useState(requestedTabIsValid ? requestedTab! : 'overview');
+
+  useEffect(() => {
+    if (requestedTabIsValid && requestedTab && requestedTab !== tab) {
+      setTab(requestedTab);
+    }
+  }, [requestedTabIsValid, requestedTab, tab]);
 
   const { data: pet, isLoading } = useQuery({
     queryKey: ['pet', id],
@@ -58,6 +65,24 @@ export default function PetDetailPage() {
     queryKey: ['feeding-logs', id],
     queryFn: () => feedingApi.logs(Number(id)).then((r) => r.data.results || r.data),
     enabled: tab === 'feeding',
+  });
+
+  const { data: activityLogs = [] } = useQuery({
+    queryKey: ['activity-logs', id],
+    queryFn: () => activityApi.logs(Number(id)).then((r) => r.data.results || r.data),
+    enabled: tab === 'activity',
+  });
+
+  const { data: activityStats } = useQuery({
+    queryKey: ['activity-stats', id],
+    queryFn: () => activityApi.stats(Number(id)).then((r) => r.data),
+    enabled: tab === 'activity',
+  });
+
+  const { data: reminders = [] } = useQuery({
+    queryKey: ['pet-reminders', id],
+    queryFn: () => calendarApi.petReminders(Number(id)).then((r) => r.data.results || r.data),
+    enabled: tab === 'calendar',
   });
 
   if (isLoading) {
@@ -98,8 +123,8 @@ export default function PetDetailPage() {
         animate={{ opacity: 1, y: 0 }}
         className="zoaria-card"
       >
-        <div className="flex items-center gap-6">
-          <div className="w-24 h-24 rounded-3xl bg-sage-100 flex items-center justify-center text-5xl overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-sage-100 flex items-center justify-center text-5xl overflow-hidden">
             {pet.photo_url
               ? <img src={pet.photo_url} alt={pet.name} className="w-full h-full object-cover" />
               : AVATARS[pet.avatar_type] || '🐾'}
@@ -128,7 +153,7 @@ export default function PetDetailPage() {
             </div>
           </div>
           {/* Quick stats */}
-          <div className="hidden sm:grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
             {pet.weight && (
               <div className="text-center p-3 bg-sage-50 rounded-2xl">
                 <p className="text-xs text-obsidian-400">Weight</p>
@@ -260,13 +285,60 @@ export default function PetDetailPage() {
         )}
 
         {/* ── Activity / Calendar placeholders ── */}
-        {(tab === 'activity' || tab === 'calendar') && (
-          <div className="zoaria-card text-center py-12 border-dashed">
-            <div className="text-4xl mb-3">{tab === 'activity' ? '🏃' : '📅'}</div>
-            <h3 className="font-semibold text-obsidian-900 mb-1">
-              {tab === 'activity' ? 'Activity Tracking' : 'Health Calendar'}
-            </h3>
-            <p className="text-obsidian-500 text-sm">Coming in Phase 4</p>
+        {tab === 'activity' && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="zoaria-card space-y-3">
+              <h3 className="font-semibold text-obsidian-900">Activity Stats (30 days)</h3>
+              {[
+                { label: 'Sessions', value: activityStats?.sessions ?? 0 },
+                { label: 'Distance', value: `${activityStats?.total_distance ?? 0} km` },
+                { label: 'Duration', value: `${activityStats?.total_duration ?? 0} min` },
+                { label: 'Calories', value: `${activityStats?.total_calories ?? 0} kcal` },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex justify-between text-sm border-b border-sage-100 pb-2 last:border-0 last:pb-0">
+                  <span className="text-obsidian-500">{label}</span>
+                  <span className="font-medium text-obsidian-800">{value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="zoaria-card">
+              <h3 className="font-semibold text-obsidian-900 mb-4">Recent Activity</h3>
+              {activityLogs.length === 0
+                ? <p className="text-obsidian-400 text-sm text-center py-4">No activity logs yet</p>
+                : activityLogs.map((a: any) => (
+                    <div key={a.id} className="p-3 bg-sage-50 rounded-xl mb-2">
+                      <p className="font-semibold text-sm text-obsidian-800 capitalize">{a.activity_type}</p>
+                      <p className="text-xs text-obsidian-500">
+                        {a.distance || 0} km · {a.duration_minutes || 0} min · {a.calories_burned || a.estimated_calories || 0} kcal
+                      </p>
+                      <p className="text-xs text-obsidian-400 mt-1">{new Date(a.activity_date).toLocaleDateString()}</p>
+                    </div>
+                  ))
+              }
+            </div>
+          </div>
+        )}
+
+        {tab === 'calendar' && (
+          <div className="zoaria-card">
+            <h3 className="font-semibold text-obsidian-900 mb-4">Health Reminders</h3>
+            {reminders.length === 0
+              ? <p className="text-obsidian-400 text-sm text-center py-8">No reminders yet</p>
+              : reminders.map((r: any) => (
+                  <div key={r.id} className="flex items-center gap-3 p-3 border-b border-sage-100 last:border-0">
+                    <span className="text-lg">📅</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm text-obsidian-800 truncate">
+                        {r.title || r.reminder_type}
+                      </p>
+                      <p className="text-xs text-obsidian-500">{new Date(r.reminder_date).toLocaleDateString()}</p>
+                    </div>
+                    {r.repeat_interval_days && (
+                      <span className="badge bg-sage-100 text-sage-700 text-xs">Every {r.repeat_interval_days}d</span>
+                    )}
+                  </div>
+                ))
+            }
           </div>
         )}
       </motion.div>
