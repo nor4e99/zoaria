@@ -114,9 +114,18 @@ export const feedingApi = {
 };
 
 export const activityApi = {
-  logs: (petId: number) => api.get(`/activity/logs/?pet=${petId}`),
-  createLog: (data: any) => api.post('/activity/logs/', data),
-  deleteLog: (id: number) => api.delete(`/activity/logs/${id}/`),
+  logs: (petId: number, params?: { since?: string; until?: string }) =>
+    api.get(`/activity/pets/${petId}/`, {
+      params: params
+        ? Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined))
+        : undefined,
+    }),
+  stats: (petId: number, period = 30) =>
+    api.get(`/activity/pets/${petId}/stats/`, {
+      params: { period: Math.min(365, Math.max(1, period)) },
+    }),
+  createLog: (petId: number, data: any) => api.post(`/activity/pets/${petId}/`, data),
+  deleteLog: (id: number) => api.delete(`/activity/${id}/`),
 };
 
 export const calendarApi = {
@@ -125,6 +134,7 @@ export const calendarApi = {
   updateAppointment: (id: number, data: any) => api.patch(`/calendar/appointments/${id}/`, data),
   deleteAppointment: (id: number) => api.delete(`/calendar/appointments/${id}/`),
   reminders: () => api.get('/calendar/reminders/'),
+  petReminders: (petId: number) => api.get(`/calendar/pets/${petId}/reminders/`),
   createReminder: (data: any) => api.post('/calendar/reminders/', data),
   deleteReminder: (id: number) => api.delete(`/calendar/reminders/${id}/`),
 };
